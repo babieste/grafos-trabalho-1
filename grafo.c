@@ -146,7 +146,16 @@ int verificaConexidade(Vertice G[], int ordem) {
 		
 		while (aux != NULL) {
 			int j = aux->nome; /* pego o nome do vertice adjacente */
-			if (G[j].nome == i) return 0; /* se ha adjacencia ao vertice em questao, e um laco */
+
+ 			/*
+			 se ha adjacencia ao vertice em questao, e um laco.
+			 Apesar de nao ser uma condicao contraria a conexidade,
+			 possuir um laco impede que o grafo seja arvore, por isso
+			 retornamos zero. MELHORIA: retirar essa verificacao
+			 e coloca-la em um metodo proprio.
+			*/
+			if (G[j].nome == i) return 0;
+
 			if (G[j].marca == 0) /* verifico se o vertice esta marcado */
 				G[j].marca = 1; /* se nao estiver, marco-o */
 			
