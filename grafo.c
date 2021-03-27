@@ -114,6 +114,61 @@ int  calculaTamanho(Vertice G[], int ordem) {
 	return totalArestas/2 + ordem;
 }
 
+/*
+	Um grafo conexo G e uma arvore se e somente se |AG| = |VG|-1
+*/
+int verificaCondicaoArvore(Vertice G[], int ordem) {
+	int totalArestas = calculaTamanho(G, ordem) - ordem;
+	if (totalArestas == (ordem - 1)) return 1;
+	return 0;
+}
+
+/*
+	Verifica se o grafo e conexo, retornando 1 em caso positivo
+	e 0 em caso negativo
+*/
+int verificaConexidade(Vertice G[], int ordem) {
+	int eConexo = 1;
+	int i = 0;
+	/* Escolha um vertice v0 de G e marque-o  com 1 */
+	G[i].marca = 1;
+	
+	/*
+		Se existir uma aresta que incide em um vertice v[i] marcado com 1
+		e um vertice v[j] marcado com 0, marque v[j] com 1 ate que nenhum
+		novo vertice seja marcado com 1
+	*/
+	while (i < ordem) {
+		Aresta *aux = G[i].prim; /* referencio a primeira aresta da lista */
+		if (aux == NULL) {
+			G[i].marca = 0; /* se o vertice nao possui arestas entao e imediatamente desconexo */
+		}
+		
+		while (aux != NULL) {
+			int j = aux->nome; /* pego o nome do vertice adjacente */
+			if (G[j].nome == i) return 0; /* se ha adjacencia ao vertice em questao, e um laco */
+			if (G[j].marca == 0) /* verifico se o vertice esta marcado */
+				G[j].marca = 1; /* se nao estiver, marco-o */
+			
+			aux = aux->prox;
+		}
+		
+		i++;
+	}
+	
+	/*
+		itero sobre os vertices para verificar se ha vertices que
+		nao foram marcados. Se ha, o grafo nao e conexo.
+	*/
+	int j;
+	for(j = 0; j < ordem; j++) {
+		if (G[j].marca == 0)
+			eConexo = 0;
+	}
+	
+	return eConexo;
+}
+
 /*  
  * Imprime um grafo com uma notacao similar a uma lista de adjacencia.
  */
@@ -128,7 +183,7 @@ void imprimeGrafo(Vertice G[], int ordem) {
 		printf("\n    V%d (Marca:%d): ", i, G[i].marca);
 		aux = G[i].prim;
 		for(; aux != NULL; aux = aux->prox)
-			printf("V%3d", aux->nome);
+			printf(" V%d", aux->nome);
 	}
 	printf("\n\n");
 }
@@ -140,8 +195,12 @@ void imprimeGrafo(Vertice G[], int ordem) {
 int main(int argc, char *argv[]) {
 	Vertice *G;
 	int ordemG = 6;
+	int condicao = 0;
+	int eConexo = 0;
 		
 	criaGrafo(&G, ordemG);
+
+	/*
 	acrescentaAresta(G, ordemG, 0, 0);
 	acrescentaAresta(G, ordemG, 3, 4);
 	acrescentaAresta(G, ordemG, 4, 3);
@@ -149,10 +208,24 @@ int main(int argc, char *argv[]) {
 	acrescentaAresta(G, ordemG, 5, 4);
 	acrescentaAresta(G, ordemG, 2, 3);
 	acrescentaAresta(G, ordemG, 3, 0);
-
+	*/
+	
+	acrescentaAresta(G, ordemG, 0, 1);
+	acrescentaAresta(G, ordemG, 1, 2);
+	acrescentaAresta(G, ordemG, 2, 5);
+	acrescentaAresta(G, ordemG, 5, 4);
+	acrescentaAresta(G, ordemG, 1, 3);
+	
 	imprimeGrafo(G, ordemG);
+	
+	eConexo = verificaConexidade(G, ordemG);
+	if (eConexo) {
+		printf("\nO grafo e conexo! Verificando condicao para ser arvore...\n");
+		condicao = verificaCondicaoArvore(G, ordemG);
+		if (condicao) printf("\nO grafo possui a condicao de arvore, logo e uma arvore!\n");
+		else printf("\nO grafo nao possui a condicao de arvore, logo nao e uma arvore\n");
+	} else printf("\nO grafo nao e conexo, logo nao e uma arvore!\n");
 
-    
 	destroiGrafo(&G, ordemG);
     system("PAUSE");
 	return 0;
