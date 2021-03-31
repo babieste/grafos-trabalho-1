@@ -1,3 +1,8 @@
+/*
+	Barbara E. Fernandez - 31937039
+	Salomon A. Motoryn - 41825128
+*/
+
 /* 
  * REPRESENTACAO DE GRAFOS - Versao 2021/1
  */
@@ -88,7 +93,7 @@ int acrescentaAresta(Vertice G[], int ordem, int v1, int v2) {
 
 	/* Acrescento aresta na lista do vertice v2 se v2 != v1 */
 	if (v1 == v2) return 1;
-	
+
 	A2 = (Aresta *) malloc(sizeof(Aresta));
 	A2->nome = v1;
 	A2->prox = G[v2].prim;
@@ -115,7 +120,8 @@ int  calculaTamanho(Vertice G[], int ordem) {
 }
 
 /*
-	Um grafo conexo G e uma arvore se e somente se |AG| = |VG|-1
+	Um grafo conexo G e uma arvore se e somente se |AG| = |VG|-1.
+	Se a condicao e verdadeira, retorna 1. Caso contrario, retorna 0.
 */
 int verificaCondicaoArvore(Vertice G[], int ordem) {
 	int totalArestas = calculaTamanho(G, ordem) - ordem;
@@ -124,8 +130,8 @@ int verificaCondicaoArvore(Vertice G[], int ordem) {
 }
 
 /*
-	Verifica se o grafo e conexo, retornando 1 em caso positivo
-	e 0 em caso negativo
+	Verifica se o grafo e conexo, retornando 1
+	em caso positivo e 0 em caso negativo.
 */
 int verificaConexidade(Vertice G[], int ordem) {
 	int eConexo = 1;
@@ -140,6 +146,7 @@ int verificaConexidade(Vertice G[], int ordem) {
 	*/
 	while (i < ordem) {
 		Aresta *aux = G[i].prim; /* referencio a primeira aresta da lista */
+
 		if (aux == NULL) {
 			G[i].marca = 0; /* se o vertice nao possui arestas entao e imediatamente desconexo */
 		}
@@ -151,13 +158,12 @@ int verificaConexidade(Vertice G[], int ordem) {
 			 se ha adjacencia ao vertice em questao, e um laco.
 			 Apesar de nao ser uma condicao contraria a conexidade,
 			 possuir um laco impede que o grafo seja arvore, por isso
-			 retornamos zero. MELHORIA: retirar essa verificacao
-			 e coloca-la em um metodo proprio.
+			 retornamos zero.
 			*/
 			if (G[j].nome == i) return 0;
 
-			if (G[j].marca == 0) /* verifico se o vertice esta marcado */
-				G[j].marca = 1; /* se nao estiver, marco-o */
+			if (G[j].marca == 0)
+				G[j].marca = 1;
 			
 			aux = aux->prox;
 		}
@@ -204,11 +210,13 @@ void imprimeGrafo(Vertice G[], int ordem) {
 int main(int argc, char *argv[]) {
 	Vertice *G;
 	int ordemG = 6;
-	int condicao = 0;
 	int eConexo = 0;
+	int condicao = 0;
+	int eArvore = 0;
 		
 	criaGrafo(&G, ordemG);
 
+	/* Teste com grafo invalido */
 	/*
 	acrescentaAresta(G, ordemG, 0, 0);
 	acrescentaAresta(G, ordemG, 3, 4);
@@ -219,6 +227,7 @@ int main(int argc, char *argv[]) {
 	acrescentaAresta(G, ordemG, 3, 0);
 	*/
 	
+	/* Teste com  grafo valido */
 	acrescentaAresta(G, ordemG, 0, 1);
 	acrescentaAresta(G, ordemG, 1, 2);
 	acrescentaAresta(G, ordemG, 2, 5);
@@ -227,13 +236,19 @@ int main(int argc, char *argv[]) {
 	
 	imprimeGrafo(G, ordemG);
 	
+	/*
+		Verificamos em um primeiro passo se o grafo e conexo e se nao possui lacos.
+		Caso seja verdade, fazemos a verificacao da condicao |AG| = |VG|-1.
+		Se ambas forem verdadeiras, o grafo e uma arvore.
+	*/
 	eConexo = verificaConexidade(G, ordemG);
 	if (eConexo) {
-		printf("\nO grafo e conexo! Verificando condicao para ser arvore...\n");
 		condicao = verificaCondicaoArvore(G, ordemG);
-		if (condicao) printf("\nO grafo possui a condicao de arvore, logo e uma arvore!\n");
-		else printf("\nO grafo nao possui a condicao de arvore, logo nao e uma arvore\n");
-	} else printf("\nO grafo nao e conexo, logo nao e uma arvore!\n");
+		if (condicao) eArvore = 1;
+	}
+	
+	if (eArvore) printf("\nO grafo em questao e arvore.\n\n");
+	else printf("\nO grafo em questao NAO e arvore.\n\n");
 
 	destroiGrafo(&G, ordemG);
     system("PAUSE");
