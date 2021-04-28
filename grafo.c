@@ -130,6 +130,64 @@ int verificaCondicaoArvore(Vertice G[], int ordem) {
 }
 
 /*
+	Como utilizamos o campo "marca" para verificarmos tanto a conexidade
+	quanto se o grafo possui lacos, a cada verificacao precisamos "resetar"
+	esse campo para que nao haja interferencia, isto e, para todo vertice,
+	marcamos o campo como zero.
+*/
+void resetaGrafo(Vertice G[], int ordem) {
+	int i = 0;
+
+	while (i < ordem) {
+		Aresta *aux = G[i].prim;
+
+		while (aux != NULL) {
+			int j = aux->nome;
+			G[j].marca = 0;
+			aux = aux->prox;
+		}
+
+		i++;
+	}
+}
+
+/*
+	Um grafo possui lacos se um vertice possui adjacencia a ele mesmo.
+	Caso o grafo em questao possua ao menos um vertice, ele nao podera
+	ser vertice. A funcao retorna 1 para verdadeiro e 0 para falso.
+*/
+int possuiLaco(Vertice G[], int ordem) {
+	int possuiLaco = 1;
+	int i = 0;
+
+	while (i < ordem) {
+		Aresta *aux = G[i].prim;
+
+		if (aux == NULL)
+			G[i].marca = 1; /* se o vertice nao possui arestas entao nao possui lacos */
+
+		while (aux != NULL) {
+			int j = aux->nome;
+
+			if(G[j].nome == i)
+				G[i].marca = 1;
+
+			aux = aux->prox;
+		}
+
+		i++;
+	}
+
+	int j;
+	for (j = 0; j < ordem; j++) {
+		if (G[j].marca == 0)
+			possuiLaco = 0;
+	}
+
+	return possuiLaco;
+}
+
+/*
 	Verifica se o grafo e conexo, retornando 1
 	em caso positivo e 0 em caso negativo.
 */
@@ -153,14 +211,6 @@ int verificaConexidade(Vertice G[], int ordem) {
 		
 		while (aux != NULL) {
 			int j = aux->nome; /* pego o nome do vertice adjacente */
-
- 			/*
-			 se ha adjacencia ao vertice em questao, e um laco.
-			 Apesar de nao ser uma condicao contraria a conexidade,
-			 possuir um laco impede que o grafo seja arvore, por isso
-			 retornamos zero.
-			*/
-			if (G[j].nome == i) return 0;
 
 			if (G[j].marca == 0)
 				G[j].marca = 1;
@@ -213,6 +263,7 @@ int main(int argc, char *argv[]) {
 	int eConexo = 0;
 	int condicao = 0;
 	int eArvore = 0;
+	int temLaco = 0;
 		
 	criaGrafo(&G, ordemG);
 
@@ -242,7 +293,10 @@ int main(int argc, char *argv[]) {
 		Se ambas forem verdadeiras, o grafo e uma arvore.
 	*/
 	eConexo = verificaConexidade(G, ordemG);
-	if (eConexo) {
+	resetaGrafo(G, ordemG); /* resetamos a marcacao dos vertices */
+	temLaco = possuiLaco(G, ordemG);
+
+	if (eConexo && !temLaco) {
 		condicao = verificaCondicaoArvore(G, ordemG);
 		if (condicao) eArvore = 1;
 	}
