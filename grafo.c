@@ -153,8 +153,8 @@ void resetaGrafo(Vertice G[], int ordem) {
 
 /*
 	Um grafo possui lacos se um vertice possui adjacencia a ele mesmo.
-	Caso o grafo em questao possua ao menos um vertice, ele nao podera
-	ser vertice. A funcao retorna 1 para verdadeiro e 0 para falso.
+	Caso o grafo em questao possua ao menos um laco, ele nao podera
+	ser arvore. A funcao retorna 1 para verdadeiro e 0 para falso.
 */
 int possuiLaco(Vertice G[], int ordem) {
 	int possuiLaco = 1;
