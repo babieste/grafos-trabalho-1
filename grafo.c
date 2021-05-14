@@ -309,3 +309,23 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
+
+int buscaLargura(int s){
+  // …
+  while (isempty()!=1){
+    u=dequeue();
+    // …
+    while(e!=NULL) {       
+      v=e->indiceVertice;
+      if (graph[v].colour==WHITE){
+        graph[v].colour=GRAY;
+        graph[v].d=graph[u].d+1;
+        graph[v].pre=u;
+
+        enqueue(v);
+      } // end if WHITE
+      e=e->edgePtr; // update e for all colours!
+    } // end loop over all edges e
+    graph[u].colour=BLACK;
+  } // end loop while queue is not empty
+} // end function
