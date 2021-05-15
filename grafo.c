@@ -11,6 +11,10 @@
 #include <limits.h>
 #include <memory.h>
 
+#define BRANCO 0
+#define CINZA 1
+#define PRETO 2
+
 /* 
  * Estrutura de dados para representar grafos
  */
@@ -19,9 +23,12 @@ typedef struct a { /* Celula de uma lista de arestas */
 	struct a *prox;
 } Aresta;
 
-typedef struct vert {  /* Cada vertice tem um ponteiro para uma lista de arestas incidentes nele */
+typedef struct v {
 	int nome;
 	int marca;
+	int cor; /* Utilizamos cores para facilitar a manipulacao, sendo 0 para BRANCO, 1 para CINZA e 2 para PRETO */
+	int d, f; /* Valores para o calculo de tempo no algoritmo DFS, conforme algoritmo do Cormen */
+	Aresta *pi; /* Representa o predecessor do vertice na busca */
 	Aresta *prim;
 } Vertice;
 
@@ -253,6 +260,49 @@ void imprimeGrafo(Vertice G[], int ordem) {
 	printf("\n\n");
 }
 
+int DFS_visit(Vertice G[], int indice, int tempo) {
+	int i;
+
+	tempo = tempo + 1;
+	G[indice].d = tempo;
+	G[indice].cor = CINZA;
+	
+	printf("\n\nVisitando vertice V%d\n\t- cor: %d\n\t- descoberto (d): %d", indice, G[indice].cor, G[indice].d);
+
+	Aresta *aux = G[indice].prim;
+
+	while (aux != NULL) { /* para cada vertice em adjacencia a G[indice] */
+		int v = aux->nome;
+		if (G[v].cor == BRANCO) {
+			G[v].pi = aux;
+			tempo = DFS_visit(G, v, tempo);
+		}
+		aux = aux->prox;
+	}
+
+	G[indice].cor = PRETO;
+	tempo = tempo + 1;
+	G[indice].f = tempo;
+	
+	printf("\n\nRetornando ao vertice V%d\n\t- cor: %d\n\t- terminado (f): %d\n", indice, G[indice].cor, G[indice].f);
+	return tempo;
+}
+
+void DFS(Vertice G[], int ordem) {
+	int tempo, i;
+	/* Iniciando todos os vertices com cor BRANCO e antecessor NULO */
+	for (i = 0; i < ordem; i++) {
+		G[i].cor = BRANCO;
+		G[i].pi = NULL;
+	}
+	
+	tempo = 0; /* Inicializando tempo */
+	
+	for (i = 0; i < ordem; i++) {
+		if (G[i].cor == BRANCO)
+			DFS_visit(G, i, tempo);
+	}
+}
 
 /*
  * Programinha simples para testar a representacao de grafo
@@ -267,8 +317,7 @@ int main(int argc, char *argv[]) {
 		
 	criaGrafo(&G, ordemG);
 
-	/* Teste com grafo invalido */
-	/*
+
 	acrescentaAresta(G, ordemG, 0, 0);
 	acrescentaAresta(G, ordemG, 3, 4);
 	acrescentaAresta(G, ordemG, 4, 3);
@@ -276,40 +325,26 @@ int main(int argc, char *argv[]) {
 	acrescentaAresta(G, ordemG, 5, 4);
 	acrescentaAresta(G, ordemG, 2, 3);
 	acrescentaAresta(G, ordemG, 3, 0);
-	*/
+
 	
-	/* Teste com  grafo valido */
+	/*
 	acrescentaAresta(G, ordemG, 0, 1);
 	acrescentaAresta(G, ordemG, 1, 2);
 	acrescentaAresta(G, ordemG, 2, 5);
 	acrescentaAresta(G, ordemG, 5, 4);
 	acrescentaAresta(G, ordemG, 1, 3);
+	*/
 	
 	imprimeGrafo(G, ordemG);
 	
-	/*
-		Verificamos em um primeiro passo se o grafo e conexo e se nao possui lacos.
-		Caso seja verdade, fazemos a verificacao da condicao |AG| = |VG|-1.
-		Se ambas forem verdadeiras, o grafo e uma arvore.
-	*/
-	eConexo = verificaConexidade(G, ordemG);
-	resetaGrafo(G, ordemG); /* resetamos a marcacao dos vertices */
-	temLaco = possuiLaco(G, ordemG);
-
-	if (eConexo && !temLaco) {
-		condicao = verificaCondicaoArvore(G, ordemG);
-		if (condicao) eArvore = 1;
-	}
-	
-	if (eArvore) printf("\nO grafo em questao e arvore.\n\n");
-	else printf("\nO grafo em questao NAO e arvore.\n\n");
+	DFS(G, ordemG);
 
 	destroiGrafo(&G, ordemG);
     system("PAUSE");
 	return 0;
 }
 
-
+/*
 int buscaLargura(int s){
   // …
   while (isempty()!=1){
@@ -329,3 +364,4 @@ int buscaLargura(int s){
     graph[u].colour=BLACK;
   } // end loop while queue is not empty
 } // end function
+*/
