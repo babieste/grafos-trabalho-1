@@ -304,6 +304,27 @@ void DFS(Vertice G[], int ordem) {
 	}
 }
 
+void BFS(Vertice G[], int indice){
+  // …
+  while (isempty()!=1){
+    u=dequeue();
+    // …
+    while(e!=NULL) {       
+      v=e->indiceVertice;
+      if (G[v].cor==WHITE){
+        G[v].cor=GRAY;
+        G[v].d=G[u].d+1;
+        G[v].pre=u;
+
+        enqueue(v);
+      } // end if WHITE
+      e=e->edgePtr; // update e for all colours!
+    } // end loop over all edges e
+    G[u].cor=BLACK;
+  } // end loop while queue is not empty
+} // end function
+
+
 /*
  * Programinha simples para testar a representacao de grafo
  */
@@ -344,24 +365,5 @@ int main(int argc, char *argv[]) {
 	return 0;
 }
 
-/*
-int buscaLargura(int s){
-  // …
-  while (isempty()!=1){
-    u=dequeue();
-    // …
-    while(e!=NULL) {       
-      v=e->indiceVertice;
-      if (graph[v].colour==WHITE){
-        graph[v].colour=GRAY;
-        graph[v].d=graph[u].d+1;
-        graph[v].pre=u;
 
-        enqueue(v);
-      } // end if WHITE
-      e=e->edgePtr; // update e for all colours!
-    } // end loop over all edges e
-    graph[u].colour=BLACK;
-  } // end loop while queue is not empty
-} // end function
-*/
+
