@@ -18,6 +18,9 @@
 /* 
  * Estrutura de dados para representar grafos
  */
+
+int tamanhoFila = 0;
+
 typedef struct a { /* Celula de uma lista de arestas */
 	int nome;
 	struct a *prox;
@@ -31,6 +34,8 @@ typedef struct v {
 	Aresta *pi; /* Representa o predecessor do vertice na busca */
 	Aresta *prim;
 } Vertice;
+
+
 
 /*
  * Declaracoes das funcoes para manipulacao de grafos 
@@ -332,7 +337,6 @@ void BFS(Vertice G[], int ordem, int s){
 	s.pi = NULL;
 	
 	Vertice fila[100];  //representar uma fila
-	int tamanhofila = 0
 	enfileira(G[], s);	//colocar na fila
   	while (fila != 0){
     		u = desenfileira(G[], s);		//tirar da fila
