@@ -304,26 +304,35 @@ void DFS(Vertice G[], int ordem) {
 	}
 }
 
-void BFS(Vertice G[], int indice){
-  // …
-  while (isempty()!=1){
-    u=dequeue();
-    // …
-    while(e!=NULL) {       
-      v=e->indiceVertice;
-      if (G[v].cor==WHITE){
-        G[v].cor=GRAY;
-        G[v].d=G[u].d+1;
-        G[v].pre=u;
+void BFS(Vertice G[], int ordem, int s){
 
-        enqueue(v);
-      } // end if WHITE
-      e=e->edgePtr; // update e for all colours!
-    } // end loop over all edges e
-    G[u].cor=BLACK;
-  } // end loop while queue is not empty
-} // end function
-
+  
+	for (i = 0; i < ordem; i++) - {s} {
+		G[i].cor = BRANCO;	
+		G[i].d = -1; 
+		G[i].pi = NULL;
+	}
+	s.cor = CINZA;
+	s.d = 0;
+	s.pi = NULL;
+	
+	Q != 0;  //representar uma pilha
+	enqueue(s);	//empilhar
+  	while (isempty()!=1){
+    		u = dequeue();		//desempilhar
+  
+ 		while(e!=NULL) {       
+ 
+			if (G[v].cor==BRANCO){
+        			G[v].cor=CINZA;
+        			G[v].d=u.d+1;
+        			G[v].pi=u;
+				enqueue(v);	//empilhar
+			}
+		}
+    		G[u].cor = PRETO;
+	}
+}
 
 /*
  * Programinha simples para testar a representacao de grafo
