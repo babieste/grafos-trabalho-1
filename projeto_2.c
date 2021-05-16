@@ -3,7 +3,7 @@
 	Salomon A. Motoryn - 41825128
 */
 
-/* 
+/*
  * REPRESENTACAO DE GRAFOS - Versao 2021/1
  */
 #include <stdio.h>
@@ -35,7 +35,7 @@ typedef struct f { /* Struct da fila para o algoritmo BFS */
 } Fila;
 
 /*
- * Declaracoes das funcoes para manipulacao de grafos 
+ * Declaracoes das funcoes para manipulacao de grafos
  */
 void criaGrafo(Vertice **G, int ordem);
 void destroiGrafo(Vertice **G, int ordem);
@@ -44,17 +44,17 @@ int calculaTamanho(Vertice G[], int ordem);
 void imprimeGrafo(Vertice G[], int ordem);
 
 /*
- * Implementacao das funcoes para manipulacao de grafos 
+ * Implementacao das funcoes para manipulacao de grafos
  */
- 
+
 /*
  * Criacao de um grafo com ordem predefinida (passada como argumento),
- *   e, inicilamente, sem nenhuma aresta 
+ *   e, inicilamente, sem nenhuma aresta
  */
 void criaGrafo(Vertice **G, int ordem) {
 	int i;
 	*G = (Vertice*) malloc(sizeof(Vertice) * ordem); /* Alocacao dinamica de um vetor de vertices */
-	
+
 	for (i = 0; i < ordem; i++) {
 		(*G)[i].nome = i;
 		(*G)[i].prim = NULL;    /* Cada vertice sem nenhuma aresta incidente */
@@ -67,7 +67,7 @@ void criaGrafo(Vertice **G, int ordem) {
 void destroiGrafo(Vertice **G, int ordem) {
 	int i;
     Aresta *a, *n;
-    
+
 	for (i = 0; i < ordem; i++) { /* Remove lista de adjacencia de cada vertice */
 	    a = (*G)[i].prim;
         while (a != NULL) {
@@ -79,20 +79,20 @@ void destroiGrafo(Vertice **G, int ordem) {
     free(*G);
 }
 
-/*  
- * Acrescenta uma nova aresta em um grafo previamente criado. 
- *   Devem ser passados os extremos v1 e v2 da aresta a ser acrescentada 
+/*
+ * Acrescenta uma nova aresta em um grafo previamente criado.
+ *   Devem ser passados os extremos v1 e v2 da aresta a ser acrescentada
  * Como o grafo nao e orientado, para uma aresta com extremos i e j
  *   serao criadas, na estrutura de dados, arestas (i,j) e (j,i)
  */
 int acrescentaAresta(Vertice G[], int ordem, int v1, int v2) {
     Aresta *A1, *A2;
-    
+
 	if (v1 < 0 || v1 >= ordem) /* Testo se vertices sao validos */
 	   return 0;
 	if (v2 < 0 || v2 >= ordem)
 	   return 0;
-	
+
 	/* Acrescento aresta na lista do vertice v1 */
 	A1 = (Aresta *) malloc(sizeof(Aresta));
 	A1->nome = v2;
@@ -106,28 +106,28 @@ int acrescentaAresta(Vertice G[], int ordem, int v1, int v2) {
 	A2->nome = v1;
 	A2->prox = G[v2].prim;
 	G[v2].prim = A2;
-	
+
 	return 1;
 }
 
-/*  
+/*
  * Funcao que retorna o tamanho de um grafo
  */
 int  calculaTamanho(Vertice G[], int ordem) {
 	int i;
 	int totalArestas = 0;
-	
+
 	for (i = 0; i < ordem; i++){
 		int j;
 		Aresta *aux = G[i].prim;
 		for(j = 0; aux != NULL; aux = aux->prox, j++)
             if (aux->nome == i) j++; /* laco "conta em dobro" */
-		totalArestas += j;	
+		totalArestas += j;
 	}
 	return totalArestas/2 + ordem;
 }
 
-/*  
+/*
  * Imprime um grafo com uma notacao similar a uma lista de adjacencia.
  */
 void imprimeGrafo(Vertice G[], int ordem) {
@@ -146,21 +146,65 @@ void imprimeGrafo(Vertice G[], int ordem) {
 	printf("\n\n");
 }
 
+char imprimeCor(int codigoCor) {
+	if (codigoCor == 0)
+		printf("BRANCO");
+	else if (codigoCor == 1)
+		printf("CINZA");
+	else
+		printf("PRETO");
+}
+
+void imprimeResultadoBFS(Vertice G[], int ordem) {
+    int i;
+
+	printf("\nResultado Busca em Largura (BFS):\n");
+
+	for (i = 0; i < ordem; i++){
+		printf("\nV%d: ", i);
+        printf("\n\t- COR: "); imprimeCor(G[i].cor);
+        if (G[i].pi == -1) { /* Raiz */
+            printf("\n\t- ANTECESSOR (pi): nao ha, e a raiz");
+        } else {
+            printf("\n\t- ANTECESSOR (pi): V%d", G[i].pi);
+        }
+        printf("\n\t- DISTANCIA DA RAIZ (s): %d", G[i].distancia);
+	}
+	printf("\n\n");
+}
+
+void imprimeResultadoDFS(Vertice G[], int ordem) {
+    int i;
+
+	printf("\nResultado Busca em Profundidade (DFS):\n");
+
+	for (i = 0; i < ordem; i++){
+		printf("\nV%d: ", i);
+        printf("\n\t- COR: "); imprimeCor(G[i].cor);
+        if (G[i].pi == -1) { /* Raiz */
+            printf("\n\t- ANTECESSOR (pi): nao ha, e a raiz");
+        } else {
+            printf("\n\t- ANTECESSOR (pi): V%d", G[i].pi);
+        }
+        printf("\n\t- TEMPO DE DESCOBRIMENTO (d): %d", G[i].d);
+        printf("\n\t- TEMPO DE FINALIZACAO (f): %d", G[i].f);
+	}
+	printf("\n\n");
+}
+
 int DFS_visit(Vertice G[], int indice, int tempo) {
 	int i;
 
 	tempo = tempo + 1;
 	G[indice].d = tempo;
 	G[indice].cor = CINZA;
-	
-	printf("\n\nVisitando vertice V%d\n\t- cor: %d\n\t- descoberto (d): %d", indice, G[indice].cor, G[indice].d);
 
 	Aresta *aux = G[indice].prim;
 
 	while (aux != NULL) { /* para cada vertice em adjacencia a G[indice] */
 		int v = aux->nome;
 		if (G[v].cor == BRANCO) {
-			G[v].pi = v;
+			G[v].pi = indice;
 			tempo = DFS_visit(G, v, tempo);
 		}
 		aux = aux->prox;
@@ -169,22 +213,20 @@ int DFS_visit(Vertice G[], int indice, int tempo) {
 	G[indice].cor = PRETO;
 	tempo = tempo + 1;
 	G[indice].f = tempo;
-	
-	printf("\n\nRetornando ao vertice V%d\n\t- cor: %d\n\t- terminado (f): %d\n", indice, G[indice].cor, G[indice].f);
+
 	return tempo;
 }
 
 void DFS(Vertice G[], int ordem) {
-	printf("\n--- BUSCA EM PROFUNDIDADE ---\n");
 	int tempo, i;
 	/* Iniciando todos os vertices com cor BRANCO e antecessor NULO */
 	for (i = 0; i < ordem; i++) {
 		G[i].cor = BRANCO;
 		G[i].pi = -1;
 	}
-	
+
 	tempo = 0; /* Inicializando tempo */
-	
+
 	for (i = 0; i < ordem; i++) {
 		if (G[i].cor == BRANCO)
 			DFS_visit(G, i, tempo);
@@ -203,23 +245,14 @@ Vertice desenfileira(Fila *f) {
     for (i = 0; i < f->tamanhoFila; i++) {
         f->fila[i] = f->fila[i+1];
     }
-    
+
     return v;
 }
 
-void mostraFila(Fila f) {
-    int i;
-    printf("\nQ = [");
-    for (i = 0; i < f.tamanhoFila; i++) {
-        printf(" V%d ", f.fila[i].nome);
-    }
-    printf("]\n");
-}
-
-void BFS(Vertice G[], int ordem, int s){
+void BFS(Vertice G[], int ordem, int s) {
 	int i;
-	
-	for (i = 0; i < ordem; i++) { 
+
+	for (i = 0; i < ordem; i++) {
 		if (i != s) { /* iteramos sobre os vertices de G menos, a raiz a arvore de largura */
 			G[i].cor = BRANCO;
 			G[i].distancia = -1; /* utilizamos -1 para sinalizar infinito */
@@ -230,49 +263,29 @@ void BFS(Vertice G[], int ordem, int s){
 	G[s].cor = CINZA;
 	G[s].distancia = 0;
 	G[s].pi = -1;
-	
-	printf("\n\n--- BUSCA EM LARGURA ---\n");
-	printf("\nVertice inicial (s): V%d\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", s, G[s].cor, G[s].pi, G[s].distancia);
-	printf("\nEstado inicial dos vertices: ");
-	for(i = 0; i < ordem; i++) {
-		if (i != s)
-			printf("\nV%d:\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d", i, G[i].cor, G[i].pi, G[i].distancia);
-	}
-	
+
 	Fila f;  /* declaracao da fila */
 	f.tamanhoFila = 0;
 	enfileira(&f, G[s]);	/* coloca a raiz na fila */
-	
-	mostraFila(f);
 
 	  while (f.tamanhoFila != 0) {
 		Vertice u = desenfileira(&f);
-		
-		printf("\nDesenfileirando vertice: V%d", u.nome);
 
-		mostraFila(f);
-		
 		Aresta *a = u.prim;
-		
+
 		/* iteramos na lista de adjacencia de u */
   		while(a != NULL) {
   			Vertice v = G[a->nome];
-  			printf("\nVertice adjacente a V%d: V%d\n\t- COR: %d", u.nome, v.nome, v.cor);
  			if (v.cor == BRANCO) {
     			v.cor = CINZA;
     			v.distancia = u.distancia + 1;
     			v.pi = u.nome;
-    			printf("\nEnfileirando V%d\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", v.nome, v.cor, v.pi, v.distancia);
 				enfileira(&f, v);	/* enfileira v */
-				mostraFila(f);
 			}
 			a = a->prox;
 		}
     	u.cor = PRETO;
     	G[u.nome] = u; /* atualizar G */
-    	
-    	printf("\nLista de adjacencia de V%d finalizada:\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", u.nome, u.cor, u.pi, u.distancia);
-		mostraFila(f);
 	}
 }
 
@@ -285,24 +298,6 @@ int main(int argc, char *argv[]) {
 
 	criaGrafo(&G, ordemG);
 
-	/*
-	acrescentaAresta(G, ordemG, 0, 0);
-	acrescentaAresta(G, ordemG, 3, 4);
-	acrescentaAresta(G, ordemG, 4, 3);
-	acrescentaAresta(G, ordemG, 4, 2);
-	acrescentaAresta(G, ordemG, 5, 4);
-	acrescentaAresta(G, ordemG, 2, 3);
-	acrescentaAresta(G, ordemG, 3, 0);
-	*/
-
-	/*
-	acrescentaAresta(G, ordemG, 0, 1);
-	acrescentaAresta(G, ordemG, 1, 2);
-	acrescentaAresta(G, ordemG, 2, 5);
-	acrescentaAresta(G, ordemG, 5, 4);
-	acrescentaAresta(G, ordemG, 1, 3);
-	*/
-	
 	acrescentaAresta(G, ordemG, 0, 1);
 	acrescentaAresta(G, ordemG, 0, 4);
 	acrescentaAresta(G, ordemG, 1, 5);
@@ -315,13 +310,13 @@ int main(int argc, char *argv[]) {
 	acrescentaAresta(G, ordemG, 6, 7);
 
 	imprimeGrafo(G, ordemG);
-	
-	DFS(G, ordemG);
 
-	BFS(G, ordemG, 1);
+	DFS(G, ordemG);
+    imprimeResultadoDFS(G, ordemG);
+
+	BFS(G, ordemG, 0);
+    imprimeResultadoBFS(G, ordemG);
 
 	destroiGrafo(&G, ordemG);
-    system("PAUSE");
 	return 0;
 }
-
