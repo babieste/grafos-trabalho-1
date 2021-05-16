@@ -15,8 +15,6 @@
 #define CINZA 1
 #define PRETO 2
 
-int tamanhoFila = 0;
-
 typedef struct a { /* Celula de uma lista de arestas */
 	int nome;
 	struct a *prox;
@@ -31,6 +29,10 @@ typedef struct v {
 	Aresta *prim;
 } Vertice;
 
+typedef struct f { /* Struct da fila para o algoritmo BFS */
+	int tamanhoFila;
+	Vertice fila[100];
+} Fila;
 
 /*
  * Declaracoes das funcoes para manipulacao de grafos 
@@ -189,27 +191,27 @@ void DFS(Vertice G[], int ordem) {
 	}
 }
 
-void enfileira(Vertice fila[], Vertice v) {
-    fila[tamanhoFila] = v;
-    tamanhoFila++;
+void enfileira(Fila *f, Vertice v) {
+    f->fila[f->tamanhoFila] = v;
+    f->tamanhoFila++;
 }
 
-Vertice desenfileira(Vertice fila[]) {
+Vertice desenfileira(Fila *f) {
     int i;
-    Vertice v = fila[0];
-    tamanhoFila--;
-    for (i = 0; i < tamanhoFila; i++) {
-        fila[i] = fila[i+1];
+    Vertice v = f->fila[0];
+    f->tamanhoFila--;
+    for (i = 0; i < f->tamanhoFila; i++) {
+        f->fila[i] = f->fila[i+1];
     }
     
     return v;
 }
 
-void mostraFila(Vertice fila[]) {
+void mostraFila(Fila f) {
     int i;
     printf("\nQ = [");
-    for (i = 0; i < tamanhoFila; i++) {
-        printf(" V%d ", fila[i].nome);
+    for (i = 0; i < f.tamanhoFila; i++) {
+        printf(" V%d ", f.fila[i].nome);
     }
     printf("]\n");
 }
@@ -237,17 +239,18 @@ void BFS(Vertice G[], int ordem, int s){
 			printf("\nV%d:\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d", i, G[i].cor, G[i].pi, G[i].distancia);
 	}
 	
-	Vertice fila[100];  /* declaracao da fila */
-	enfileira(fila, G[s]);	/* coloca a raiz na fila */
+	Fila f;  /* declaracao da fila */
+	f.tamanhoFila = 0;
+	enfileira(&f, G[s]);	/* coloca a raiz na fila */
 	
-	mostraFila(fila);
+	mostraFila(f);
 
-	  while (tamanhoFila != 0) {
-		Vertice u = desenfileira(fila);
+	  while (f.tamanhoFila != 0) {
+		Vertice u = desenfileira(&f);
 		
 		printf("\nDesenfileirando vertice: V%d", u.nome);
 
-		mostraFila(fila);
+		mostraFila(f);
 		
 		Aresta *a = u.prim;
 		
@@ -260,8 +263,8 @@ void BFS(Vertice G[], int ordem, int s){
     			v.distancia = u.distancia + 1;
     			v.pi = u.nome;
     			printf("\nEnfileirando V%d\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", v.nome, v.cor, v.pi, v.distancia);
-				enfileira(fila, v);	/* enfileira v */
-				mostraFila(fila);
+				enfileira(&f, v);	/* enfileira v */
+				mostraFila(f);
 			}
 			a = a->prox;
 		}
@@ -269,7 +272,7 @@ void BFS(Vertice G[], int ordem, int s){
     	G[u.nome] = u; /* atualizar G */
     	
     	printf("\nLista de adjacencia de V%d finalizada:\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", u.nome, u.cor, u.pi, u.distancia);
-		mostraFila(fila);
+		mostraFila(f);
 	}
 }
 
