@@ -304,43 +304,18 @@ void DFS(Vertice G[], int ordem) {
 	}
 }
 
-
-typedef struct reg {
-   int         conteudo; 
-   struct reg *prox;
-} celula;
-
-
-celula *fi;
-fi = malloc (sizeof (celula));
-fi->prox = fi;
-
-
-// Tira um elemento da fila fi e devolve
-// o conteudo do elemento removido.
-// Supõe que a fila não está vazia.
-
-int tiradafila (celula *fi) {
-   celula *p;
-   p = fi->prox;  // o primeiro da fila
-   int x = p->conteudo;
-   fi->prox = p->prox;
-   free (p);
-   return x;  
+void enfileira(Vertice fila[], Vertice v) {
+    fila[tamanhoFila] = v;
+    tamanhoFila++;
 }
 
-
-// Coloca um novo elemento com conteudo y
-// na fila fi. Devolve o endereço da
-// cabeça da fila resultante.
-
-celula *colocanafila (int y, celula *fi) { 
-   celula *nova;
-   nova = malloc (sizeof (celula));
-   nova->prox = fi->prox;
-   fi->prox = nova;
-   fi->conteudo = y;
-   return nova;
+void desenfileira(Vertice fila[], Vertice v) {
+    int i;
+    v = fila[0];
+    tamanhoFila--;
+    for (i = 0; i < tamanhoFila-1; i++) {
+        fila[i] = fila[i+1];
+    }
 }
 
 
@@ -356,18 +331,17 @@ void BFS(Vertice G[], int ordem, int s){
 	s.d = 0;
 	s.pi = NULL;
 	
-	Q != 0;  //representar uma fila
-	colcoanafila(s);	//colocar na fila
-  	while (isempty()!=1){
-    		u = tiradafila();		//tirar da fila
-  
- 		while(e!=NULL) {       
- 
-			if (G[v].cor==BRANCO){
+	Vertice fila[100];  //representar uma fila
+	int tamanhofila = 0
+	enfileira(G[], s);	//colocar na fila
+  	while (fila != 0){
+    		u = desenfileira(G[], s);		//tirar da fila
+  		while(v != NULL){    
+ 			if (G[v].cor==BRANCO){
         			G[v].cor=CINZA;
         			G[v].d=u.d+1;
         			G[v].pi=u;
-				colocanafila(v);	//colocar na fila
+				enfileira(G[], s);	//colocar na fila
 			}
 		}
     		G[u].cor = PRETO;
