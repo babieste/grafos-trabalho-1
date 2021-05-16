@@ -357,9 +357,9 @@ void BFS(Vertice G[], int ordem, int s){
 	s.pi = NULL;
 	
 	Q != 0;  //representar uma fila
-	enqueue(s);	//colocar na fila
+	colcoanafila(s);	//colocar na fila
   	while (isempty()!=1){
-    		u = dequeue();		//tirar da fila
+    		u = tiradafila();		//tirar da fila
   
  		while(e!=NULL) {       
  
@@ -367,7 +367,7 @@ void BFS(Vertice G[], int ordem, int s){
         			G[v].cor=CINZA;
         			G[v].d=u.d+1;
         			G[v].pi=u;
-				enqueue(v);	//colocar na fila
+				colocanafila(v);	//colocar na fila
 			}
 		}
     		G[u].cor = PRETO;
