@@ -316,10 +316,10 @@ void BFS(Vertice G[], int ordem, int s){
 	s.d = 0;
 	s.pi = NULL;
 	
-	Q != 0;  //representar uma pilha
-	enqueue(s);	//empilhar
+	Q != 0;  //representar uma fila
+	enqueue(s);	//colocar na fila
   	while (isempty()!=1){
-    		u = dequeue();		//desempilhar
+    		u = dequeue();		//tirar da fila
   
  		while(e!=NULL) {       
  
@@ -327,7 +327,7 @@ void BFS(Vertice G[], int ordem, int s){
         			G[v].cor=CINZA;
         			G[v].d=u.d+1;
         			G[v].pi=u;
-				enqueue(v);	//empilhar
+				enqueue(v);	//colocar na fila
 			}
 		}
     		G[u].cor = PRETO;
