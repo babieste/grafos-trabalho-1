@@ -26,10 +26,6 @@ typedef struct a { /* Celula de uma lista de arestas */
 typedef struct v {
 	int nome;
 	int marca;
-	int distancia; /* Campo utilizado para marcar a distancia, no algoritmo BFS, conforme algoritmo do Cormen */
-	int cor; /* Utilizamos cores para facilitar a manipulacao, sendo 0 para BRANCO, 1 para CINZA e 2 para PRETO */
-	int d, f; /* Valores para o calculo de tempo no algoritmo DFS, conforme algoritmo do Cormen */
-	int pi; /* Representa o predecessor do vertice na busca */
 	Aresta *prim;
 } Vertice;
 
@@ -262,134 +258,6 @@ void imprimeGrafo(Vertice G[], int ordem) {
 	printf("\n\n");
 }
 
-int DFS_visit(Vertice G[], int indice, int tempo) {
-	int i;
-
-	tempo = tempo + 1;
-	G[indice].d = tempo;
-	G[indice].cor = CINZA;
-	
-	printf("\n\nVisitando vertice V%d\n\t- cor: %d\n\t- descoberto (d): %d", indice, G[indice].cor, G[indice].d);
-
-	Aresta *aux = G[indice].prim;
-
-	while (aux != NULL) { /* para cada vertice em adjacencia a G[indice] */
-		int v = aux->nome;
-		if (G[v].cor == BRANCO) {
-			G[v].pi = v;
-			tempo = DFS_visit(G, v, tempo);
-		}
-		aux = aux->prox;
-	}
-
-	G[indice].cor = PRETO;
-	tempo = tempo + 1;
-	G[indice].f = tempo;
-	
-	printf("\n\nRetornando ao vertice V%d\n\t- cor: %d\n\t- terminado (f): %d\n", indice, G[indice].cor, G[indice].f);
-	return tempo;
-}
-
-void DFS(Vertice G[], int ordem) {
-	int tempo, i;
-	/* Iniciando todos os vertices com cor BRANCO e antecessor NULO */
-	for (i = 0; i < ordem; i++) {
-		G[i].cor = BRANCO;
-		G[i].pi = -1;
-	}
-	
-	tempo = 0; /* Inicializando tempo */
-	
-	for (i = 0; i < ordem; i++) {
-		if (G[i].cor == BRANCO)
-			DFS_visit(G, i, tempo);
-	}
-}
-
-void enfileira(Vertice fila[], Vertice v) {
-    fila[tamanhoFila] = v;
-    tamanhoFila++;
-}
-
-Vertice desenfileira(Vertice fila[]) {
-    int i;
-    Vertice v = fila[0];
-    tamanhoFila--;
-    for (i = 0; i < tamanhoFila; i++) {
-        fila[i] = fila[i+1];
-    }
-    
-    return v;
-}
-
-void mostraFila(Vertice fila[]) {
-    int i;
-    printf("\nQ = [");
-    for (i = 0; i < tamanhoFila; i++) {
-        printf(" V%d ", fila[i].nome);
-    }
-    printf("]\n");
-}
-
-void BFS(Vertice G[], int ordem, int s){
-	int i;
-	
-	for (i = 0; i < ordem; i++) { 
-		if (i != s) { /* iteramos sobre os vertices de G menos, a raiz a arvore de largura */
-			G[i].cor = BRANCO;
-			G[i].distancia = -1; /* utilizamos -1 para sinalizar infinito */
-			G[i].pi = -1;
-		}
-	}
-
-	G[s].cor = CINZA;
-	G[s].distancia = 0;
-	G[s].pi = -1;
-	
-	printf("\nBUSCA EM LARGURA");
-	printf("\nVertice inicial (s): V%d\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", s, G[s].cor, G[s].pi, G[s].distancia);
-	printf("\nEstado inicial dos vertices: ");
-	for(i = 0; i < ordem; i++) {
-		if (i != s)
-			printf("\nV%d:\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d", i, G[i].cor, G[i].pi, G[i].distancia);
-	}
-	
-	Vertice fila[100];  /* declaracao da fila */
-	enfileira(fila, G[s]);	/* coloca a raiz na fila */
-	
-	mostraFila(fila);
-
-	  while (tamanhoFila != 0) {
-		Vertice u = desenfileira(fila);
-		
-		printf("\nDesenfileirando vertice: V%d", u.nome);
-
-		mostraFila(fila);
-		
-		Aresta *a = u.prim;
-		
-		/* iteramos na lista de adjacencia de u */
-  		while(a != NULL) {
-  			Vertice v = G[a->nome];
-  			printf("\nVertice adjacente a V%d: V%d\n\t- COR: %d", u.nome, v.nome, v.cor);
- 			if (v.cor == BRANCO) {
-    			v.cor = CINZA;
-    			v.distancia = u.distancia + 1;
-    			v.pi = u.nome;
-    			printf("\nEnfileirando V%d\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", v.nome, v.cor, v.pi, v.distancia);
-				enfileira(fila, v);	/* enfileira v */
-				mostraFila(fila);
-			}
-			a = a->prox;
-		}
-    	u.cor = PRETO;
-    	G[u.nome] = u; /* atualizar G */
-    	
-    	printf("\nLista de adjacencia de V%d finalizada:\n\t- COR: %d\n\t- ANTECESSOR: %d\n\t- DISTANCIA DE s: %d\n", u.nome, u.cor, u.pi, u.distancia);
-		mostraFila(fila);
-	}
-}
-
 /*
  * Programinha simples para testar a representacao de grafo
  */
@@ -435,8 +303,22 @@ int main(int argc, char *argv[]) {
 
 	imprimeGrafo(G, ordemG);
 	
-	/*DFS(G, ordemG);*/
-	BFS(G, ordemG, 1);
+	/*
+		Verificamos em um primeiro passo se o grafo e conexo e se nao possui lacos.
+		Caso seja verdade, fazemos a verificacao da condicao |AG| = |VG|-1.
+		Se ambas forem verdadeiras, o grafo e uma arvore.
+	*/
+	eConexo = verificaConexidade(G, ordemG);
+	resetaGrafo(G, ordemG); /* resetamos a marcacao dos vertices */
+	temLaco = possuiLaco(G, ordemG);
+
+	if (eConexo && !temLaco) {
+		condicao = verificaCondicaoArvore(G, ordemG);
+		if (condicao) eArvore = 1;
+	}
+
+	if (eArvore) printf("\nO grafo em questao e arvore.\n\n");
+	else printf("\nO grafo em questao NAO e arvore.\n\n");
 
 	destroiGrafo(&G, ordemG);
     system("PAUSE");
