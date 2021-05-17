@@ -146,7 +146,7 @@ void imprimeGrafo(Vertice G[], int ordem) {
 	printf("\n\n");
 }
 
-char imprimeCor(int codigoCor) {
+void imprimeCor(int codigoCor) {
 	if (codigoCor == 0)
 		printf("BRANCO");
 	else if (codigoCor == 1)
